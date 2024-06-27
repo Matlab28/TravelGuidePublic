@@ -71,6 +71,9 @@
             width: 90%;
             max-width: 500px;
             margin-top: 20px;
+            text-align: left;
+            white-space: pre-wrap;
+            font-family: Arial, sans-serif;
         }
 
         @media (min-width: 768px) {
@@ -97,7 +100,7 @@
         <input type="file">
         <input type="text" id="fromPlace" placeholder="Starting Point">
         <input type="text" id="toPlace" placeholder="Destination">
-        <input type="text" id="duration" placeholder="A Number of Days">
+        <input type="text" id="duration" placeholder="Number of Days">
         <button id="btn">Get Response</button>
     </div>
 
@@ -116,7 +119,6 @@
         const API_KEY = "AIzaSyB3GRRnXnOsnRJOhPpLQtWvKf4Bs1Hx-nU";
 
         const genAI = new GoogleGenerativeAI(API_KEY);
-
         const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
         async function run() {
@@ -132,11 +134,30 @@
 
             console.log('Gemini is working and processing...');
             
-            const result = await model.generateContent(promptMsg);
-            const response = await result.response;
-            const text = await response.text();
+            try {
+                const result = await model.generateContent(promptMsg);
+                const response = await result.response;
+                const text = await response.text();
 
-            document.getElementById('res').innerHTML = text;
+                // Format the response
+                const formattedResponse = formatResponse(text);
+
+                document.getElementById('res').innerText = formattedResponse;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('res').innerText = 'Error retrieving itinerary. Please try again.';
+            }
+        }
+
+        function formatResponse(text) {
+            text = text.trim();
+            const lines = text.split(/\r?\n/);
+            let formattedText = '';
+            lines.forEach(line => {
+                formattedText += line.replace(/\*\*/g, '').replace(/\* /g, '') + '\n';
+            });
+
+            return formattedText.trim();
         }
 
         document.getElementById('btn').addEventListener('click', run);
