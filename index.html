@@ -76,6 +76,205 @@
             font-family: Arial, sans-serif;
         }
 
+        /* Loading spinner styles */
+        .spinner {
+            display: none;
+            margin-top: 20px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #007BFF;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* End of loading spinner styles */
+
+        @media (min-width: 768px) {
+            #input-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            #input-container input[type="file"], 
+            #input-container input[type="text"], 
+            #input-container button {
+                margin: 10px 5px;
+                width: calc(33.333% - 10px);
+            }
+
+            #input-container input[type="file"] {
+                width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="input-container">
+        <input type="file">
+        <input type="text" id="toPlace" placeholder="Starting Point">
+        <input type="text" id="fromPlace" placeholder="Destination">
+        <input type="text" id="duration" placeholder="Number of Days">
+        <button id="btn">Get Response</button>
+    </div>
+
+    <!-- Loading spinner -->
+    <div class="spinner" id="spinner"></div>
+    <!-- End of loading spinner -->
+
+    <div id="res"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "@google/generative-ai": "https://esm.run/@google/generative-ai"
+            }
+        }
+    </script>
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        const API_KEY = "AIzaSyB3GRRnXnOsnRJOhPpLQtWvKf4Bs1Hx-nU";
+
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+
+        async function run() {
+            // Show spinner and clear result
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('res').innerText = '';
+
+            let fromPlace = document.getElementById('fromPlace').value;
+            let toPlace = document.getElementById('toPlace').value;
+            let duration = document.getElementById('duration').value;
+
+            let promptMsg = `
+            Create a travel itinerary from ${fromPlace} to ${toPlace} for ${duration} days
+            
+            Give me the response in only text format
+            `;
+
+            console.log('Gemini is working and processing...');
+            
+            try {
+                const result = await model.generateContent(promptMsg);
+                const response = await result.response;
+                const text = await response.text();
+
+                // Format the response
+                const formattedResponse = formatResponse(text);
+
+                document.getElementById('res').innerText = formattedResponse;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('res').innerText = 'Error retrieving itinerary. Please try again.';
+            } finally {
+                // Hide spinner
+                document.getElementById('spinner').style.display = 'none';
+            }
+        }
+
+        function formatResponse(text) {
+            text = text.trim();
+            const lines = text.split(/\r?\n/);
+            let formattedText = '';
+            lines.forEach(line => {
+                formattedText += line.replace(/\*\*/g, '').replace(/\* /g, '') + '\n';
+            });
+
+            return formattedText.trim();
+        }
+
+        document.getElementById('btn').addEventListener('click', run);
+    </script>
+</body>
+</html>
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Itinerary</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        #input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            margin-top: 30px;
+        }
+
+        #input-container input[type="file"], 
+        #input-container input[type="text"], 
+        #input-container button {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        #input-container input[type="file"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #input-container input[type="file"]::file-selector-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #input-container button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #input-container button:hover {
+            background-color: #0056b3;
+        }
+
+        #res {
+            width: 90%;
+            max-width: 500px;
+            margin-top: 20px;
+            text-align: left;
+            white-space: pre-wrap;
+            font-family: Arial, sans-serif;
+        }
+
         @media (min-width: 768px) {
             #input-container {
                 flex-direction: row;
@@ -164,3 +363,4 @@
     </script>
 </body>
 </html>
+ -->
