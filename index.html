@@ -126,6 +126,7 @@
         <input type="text" id="toPlace" placeholder="Starting Point">
         <input type="text" id="fromPlace" placeholder="Destination">
         <input type="text" id="duration" placeholder="Number of Days">
+        <input type="text" id="budget" placeholder="Budget">
         <button id="btn">Get Response</button>
     </div>
 
@@ -159,9 +160,10 @@
             let fromPlace = document.getElementById('fromPlace').value;
             let toPlace = document.getElementById('toPlace').value;
             let duration = document.getElementById('duration').value;
+            let budget = document.getElementById('budget').value;
 
             let promptMsg = `
-            Create a travel itinerary from ${fromPlace} to ${toPlace} for ${duration} days
+            Create a travel itinerary from ${fromPlace} to ${toPlace} for ${duration} days with a budget of ${budget}
             
             Give me the response in only text format
             `;
